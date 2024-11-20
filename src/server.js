@@ -1,13 +1,17 @@
+import dotenv from 'dotenv';
 import express from 'express';
 import pino from 'pino-http';
 import cors from 'cors';
 import { env } from './utils/env.js';
-import { getAllContacts, getContactById } from './services/students.js';
+import { getAllStudents, getStudentById } from './services/students.js';
 
-export async function setupServer() {
+
+dotenv.config();
+
+export async function startServer() {
   try {
     const app = express();
-    const PORT = Number(env('PORT', '3000'));
+    const PORT = Number(env('PORT', '3030'));
     app.use(express.json());
     app.use(cors());
 
@@ -25,40 +29,40 @@ export async function setupServer() {
       });
     });
 
-    app.get('/contacts', async (req, res) => {
-      const contacts = await getAllContacts();
+    app.get('/students', async (req, res) => {
+      const students = await getAllStudents();
       res.status(200).json({
         status: 200,
-        message: 'Successfully found contacts!',
-        data: contacts,
+        message: 'Successfully found students!',
+        data: students,
       });
     });
 
-    app.get('/contacts/:contactId', async (req, res,) => {
-      const { contactId } = req.params;
-      const contact = await getContactById(contactId);
+    app.get('/students/:studentId', async (req, res) => {
+      const { studentId } = req.params;
+      const student = await getStudentById(studentId);
 
-      if (!contact) {
+      if (!student) {
         res.status(404).json({
-          message: 'Contact not found',
+          message: 'Student not found',
         });
         return;
       }
 
       res.status(200).json({
         status: 200,
-        message: `Successfully found contact with id ${contactId}!`,
-        data: contact,
+        message: `Successfully found student with id ${studentId}!`,
+        data: student,
       });
     });
 
-    app.use('*', (req, res, ) => {
+    app.use('*', (req, res) => {
       res.status(404).json({
         message: 'Not found',
       });
     });
 
-    app.use((error, req, res,) => {
+    app.use((error, req, res) => {
       res.status(500).json({
         message: 'Something went wrong',
         error: error.message,
