@@ -3,7 +3,7 @@ import express from 'express';
 import pino from 'pino-http';
 import cors from 'cors';
 import { env } from './utils/env.js';
-import { getAllStudents, getStudentById } from './services/students.js';
+import { getAllStudents, getStudentById } from './services/contacts.js';
 
 
 dotenv.config();
@@ -11,7 +11,7 @@ dotenv.config();
 export async function startServer() {
   try {
     const app = express();
-    const PORT = Number(env('PORT', '3031'));
+    const PORT = Number(env('PORT', '3032'));
     app.use(express.json());
     app.use(cors());
 
