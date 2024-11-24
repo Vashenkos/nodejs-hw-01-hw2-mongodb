@@ -11,7 +11,7 @@ dotenv.config();
 export async function startServer() {
   try {
     const app = express();
-    const PORT = Number(env('PORT', '3030'));
+    const PORT = Number(env('PORT', '3031'));
     app.use(express.json());
     app.use(cors());
 
