@@ -1,35 +1,35 @@
+import mongoose from 'mongoose';
+const { Schema, model } = mongoose;
 
- import { model,Schema } from 'mongoose';
+const contactSchema = new Schema(
+  {
+    name: {
+      type: String,
+      required: true,
+    },
+    phoneNumber: {
+      type: String,
+      required: true,
+    },
+    email: {
+      type: String,
+    },
+    isFavorite: {
+      type: Boolean,
+      default: false,
+    },
+    contactType: {
+      type: String,
+      enum: ['work', 'home', 'personal'],
+      required: true,
+      default: 'personal',
+    },
+  },
+  {
+    timestamps: true,
+  },
+);
 
- const studentsSchema = new Schema(
-   {
-     name: {
-       type: String,
-       required: true,
-     },
-     age: {
-       type: Number,
-       required: true,
-     },
-     gender: {
-       type: String,
-       required: true,
-       enum: ['male', 'female', 'other'],
-     },
-     avgMark: {
-       type: Number,
-       required: true,
-     },
-     onDuty: {
-       type: Boolean,
-       required: true,
-       default: false,
-     },
-   },
-   {
-     timestamps: true,
-     versionKey: false,
-   },
- );
+const Contact = model('Contact', contactSchema);
 
- export const StudentsCollection = model('students', studentsSchema);
+export default Contact;

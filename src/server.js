@@ -1,78 +1,61 @@
-import dotenv from 'dotenv';
 import express from 'express';
 import pino from 'pino-http';
 import cors from 'cors';
-import { env } from './utils/env.js';
-import { getAllStudents, getStudentById } from './services/contacts.js';
-
+import dotenv from 'dotenv';
+import { getAllContacts, getContactById } from './services/contacts.js';
 
 dotenv.config();
 
-export async function startServer() {
-  try {
-    const app = express();
-    const PORT = Number(env('PORT', '3032'));
-    app.use(express.json());
-    app.use(cors());
+export const setupServer = () => {
+  const app = express();
 
-    app.use(
-      pino({
-        transport: {
-          target: 'pino-pretty',
-        },
-      }),
-    );
+  app.use(express.json());
+  app.use(cors());
+  app.use(
+    pino({
+      transport: {
+        target: 'pino-pretty',
+      },
+    }),
+  );
 
-    app.get('/', (req, res) => {
-      res.json({
-        message: 'Hello world',
-      });
+  app.get('/contacts', async (req, res) => {
+    const contacts = await getAllContacts();
+
+    res.status(200).send({
+      status: 200,
+      message: 'Successfully found contacts!',
+      data: contacts,
     });
+  });
 
-    app.get('/students', async (req, res) => {
-      const students = await getAllStudents();
-      res.status(200).json({
-        status: 200,
-        message: 'Successfully found students!',
-        data: students,
-      });
+  app.get('/contacts/:contactId', async (req, res, next) => {
+    const { contactId } = req.params;
+    const contact = await getContactById(contactId);
+
+    if (contact === null) {
+      return res
+        .status(404)
+        .send({ status: 404, message: 'Contact not found' });
+    }
+
+    res.status(200).send({
+      status: 200,
+      message: `Successfully found contact with id ${contactId}!`,
+      data: contact,
     });
+  });
 
-    app.get('/students/:studentId', async (req, res) => {
-      const { studentId } = req.params;
-      const student = await getStudentById(studentId);
+  app.use((req, res, next) => {
+    res.status(404).send({ status: 404, message: 'Not found' });
+  });
 
-      if (!student) {
-        res.status(404).json({
-          message: 'Student not found',
-        });
-        return;
-      }
+  app.use((err, _req, res, _next) => {
+    res.status(500).send({ status: 500, message: 'Internal server error' });
+  });
 
-      res.status(200).json({
-        status: 200,
-        message: `Successfully found student with id ${studentId}!`,
-        data: student,
-      });
-    });
-
-    app.use('*', (req, res) => {
-      res.status(404).json({
-        message: 'Not found',
-      });
-    });
-
-    app.use((error, req, res) => {
-      res.status(500).json({
-        message: 'Something went wrong',
-        error: error.message,
-      });
-    });
-
-    app.listen(PORT, () => {
-      console.log(`Server is running on port ${PORT}`);
-    });
-  } catch (error) {
-    console.log(error);
-  }
-}
+  const PORT = Number(process.env.PORT) || 3000;
+  app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+  });
+};
