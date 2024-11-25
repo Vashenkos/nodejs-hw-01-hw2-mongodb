@@ -29,7 +29,7 @@ export const setupServer = () => {
     });
   });
 
-  app.get('/contacts/:contactId', async (req, res, next) => {
+  app.get('/contacts/:contactId', async (req, res,) => {
     const { contactId } = req.params;
     const contact = await getContactById(contactId);
 
@@ -46,11 +46,11 @@ export const setupServer = () => {
     });
   });
 
-  app.use((req, res, next) => {
+  app.use((req, res,) => {
     res.status(404).send({ status: 404, message: 'Not found' });
   });
 
-  app.use((err, _req, res, _next) => {
+  app.use((err, _req, res,) => {
     res.status(500).send({ status: 500, message: 'Internal server error' });
   });
 
